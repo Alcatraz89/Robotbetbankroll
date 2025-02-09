@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoBOT Masax v1</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Modalità base (giorno) */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .notte {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>RoBOT Masa v1</h1>
+    
+    <!-- Modalità Giorno/Notte -->
+    <button onclick="toggleModalita()">🌞</button>
+
+    <!-- Input Cassa Iniziale -->
+    <div id="input-container">
+        <h3>Inserisci Cassa Iniziale:</h3>
+        <input type="number" id="cassa-iniziale" placeholder="€" step="0.01" min="0">
+		<br>
+        <button onclick="caricaSessione()">Carica Sessione</button>
+        <button onclick="iniziaGioco()">Inizia</button>
+    </div>
+
+    <!-- Sezione Puntate -->
+    <div id="gioco" style="display:none;">
+        <h3>Cassa Attuale: <span id="cassa-attuale">€0.00</span></h3>
+        <h3>Puntata Attuale: <span id="puntata">€0.00</span></h3>
+        <label for="quota-giocata">Quota:</label>
+        <input type="number" id="quota-giocata" placeholder="Quota" step="0.01" min="1.01">
+        <br>
+        <button onclick="giocataVinta()">Vinta</button>
+        <button onclick="giocataPersa()">Persa</button>
+        <br><br>
+        <button onclick="salvaSessione()">Salva Progressione</button>
+        <canvas id="grafico-cassa" width="400" height="200"></canvas>
+    </div>
+	<button class="reset" onclick="reset()">RESET</button>
+
+    <script>
+        let cassaIniziale = 0;
+        let cassaAttuale = 0;
+        let giocataCorrente = 0;
+        let datiGrafico = [];
+        let etichetteGrafico = [];
+
+        function toggleModalita() {
+            document.body.classList.toggle("notte");
+        }
+
+        function iniziaGioco() {
+            cassaIniziale = parseFloat(document.getElementById("cassa-iniziale").value);
+            if (isNaN(cassaIniziale) || cassaIniziale <= 0) {
+                alert("Inserisci una cassa valida.");
+                return;
+            }
+            cassaAttuale = cassaIniziale;
+            aggiornaPuntata();
+            datiGrafico = [cassaAttuale];
+            etichetteGrafico = [0];
+            document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+            document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+            document.getElementById("input-container").style.display = "none";
+            document.getElementById("gioco").style.display = "block";
+            aggiornaGrafico();
+        }
+
+let win_streak = 0;
+let loss_streak = 0;
+
+function aggiornaPuntata() {
+    if (loss_streak >= 2) {
+        giocataCorrente = Math.min(cassaAttuale * 0.15, giocataCorrente * 1.5); // Stake aumenta dopo 2 perse
+    } else if (win_streak >= 3) {
+        giocataCorrente *= 0.9; // Stake ridotto dopo 3 vittorie di fila
+    } else {
+        giocataCorrente = Math.round((cassaAttuale * 0.05) * 2) / 2; // Stake al 5% con arrotondamento
+    }
+    document.getElementById('puntata').textContent = `€${giocataCorrente.toFixed(2)}`;
+}
+
+function giocataVinta() {
+    const quota = parseFloat(document.getElementById("quota-giocata").value);
+    if (isNaN(quota) || quota <= 1) {
+        alert("Inserisci una quota valida.");
+        return;
+    }
+    
+    cassaAttuale += giocataCorrente * (quota - 1);
+    win_streak++; // Incrementa la serie di vittorie
+    loss_streak = 0; // Resetta la serie di sconfitte
+
+    // Se vinci 3 volte di fila, riduci lo stake del 10% per proteggere il bankroll
+    if (win_streak >= 3) {
+        giocataCorrente *= 0.9; // Diminuisce del 10%
+    } else {
+        giocataCorrente = Math.round((cassaAttuale * 0.05) * 2) / 2; // Torna al 5%
+    }
+
+    aggiornaDopoGiocata();
+}
+
+
+
+
+
+function giocataPersa() {
+    cassaAttuale -= giocataCorrente;
+    win_streak = 0; // Resetta la serie di vittorie
+    loss_streak++; // Incrementa la serie di sconfitte
+
+    // Se perdi 2 volte di fila, aumenta lo stake per il recupero
+    if (loss_streak >= 2) {
+        giocataCorrente = Math.min(cassaAttuale * 0.15, giocataCorrente * 1.5); // Massimo 15% del bankroll
+    } else {
+        giocataCorrente = Math.round((cassaAttuale * 0.05) * 2) / 2; // Torna al 5%
+    }
+
+    aggiornaDopoGiocata();
+}
+
+
+
+function aggiornaDopoGiocata() {
+    cassaAttuale = Math.max(0, cassaAttuale); // Evita valori negativi
+    aggiornaPuntata();
+    datiGrafico.push(cassaAttuale);
+    etichetteGrafico.push(datiGrafico.length);
+    document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+    document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+    aggiornaGrafico();
+}
+
+
+        function aggiornaGrafico() {
+            const ctx = document.getElementById("grafico-cassa").getContext("2d");
+            if (window.grafico) window.grafico.destroy();
+            window.grafico = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: etichetteGrafico,
+                    datasets: [{
+                        label: "Cassa Attuale",
+                        data: datiGrafico,
+                        borderColor: "blue",
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: "Giocate" } },
+                        y: { title: { display: true, text: "Cassa (€)" } }
+                    }
+                }
+            });
+        }
+        function salvaSessione() {
+            const progressione = {
+                cassaAttuale,
+                giocataCorrente,
+                datiGrafico,
+                etichetteGrafico
+            };
+            localStorage.setItem("progressioneMasaniello", JSON.stringify(progressione));
+            alert("Progressione salvata!");
+        }
+function reset() {
+    // Resetta le variabili della sessione
+    cassaIniziale = 0;
+    cassaAttuale = 0;
+    giocataCorrente = 0;
+    datiGrafico = [];
+    etichetteGrafico = [];
+    
+    // Resetta il localStorage per eliminare i dati salvati
+    localStorage.removeItem("progressioneMasaniello");
+
+    // Resetta l'input della cassa iniziale
+    document.getElementById("cassa-iniziale").value = "";
+
+    // Ripristina la visibilità dei container
+    document.getElementById("input-container").style.display = "block";
+    document.getElementById("gioco").style.display = "none";
+
+    // Pulisce il grafico e l'area dei risultati
+    document.getElementById("cassa-attuale").textContent = "€0.00";
+    document.getElementById("puntata").textContent = "€0.00";
+    document.getElementById("quota-giocata").value = "";
+
+    // Resetta il grafico se esiste
+    if (window.grafico) {
+        window.grafico.destroy();
+    }
+
+    alert("Sessione resettata!");
+}
+
+
+        function caricaSessione() {
+            const progressione = JSON.parse(localStorage.getItem("progressioneMasaniello"));
+            if (!progressione) {
+                alert("Nessuna sessione salvata trovata.");
+                return;
+            }
+            cassaAttuale = progressione.cassaAttuale;
+            giocataCorrente = progressione.giocataCorrente;
+            datiGrafico = progressione.datiGrafico;
+            etichetteGrafico = progressione.etichetteGrafico;
+            document.getElementById("input-container").style.display = "none";
+            document.getElementById("gioco").style.display = "block";
+            document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+            document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+            aggiornaGrafico();
+            alert("Sessione caricata!");
+        }
+    </script>
+</body>
+</html>
