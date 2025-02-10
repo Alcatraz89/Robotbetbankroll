@@ -245,7 +245,10 @@ Grazie a un algoritmo avanzato, il sistema adatta le puntate automaticamente in 
         <br>
         <button class="btn-verde" onclick="giocataVinta()">Vinta</button>
 <button class="btn-rosso" onclick="giocataPersa()">Persa</button>
-        <h3>Cassa Attuale: <span id="cassa-attuale">€0.00</span></h3>
+        <<h3>Cassa Attuale: <span id="cassa-attuale">€0.00</span></h3>
+<h4>Totali Giocate: <span id="totali-giocate">0</span></h4>
+<h4>Vittorie %: <span id="percentuale-vittorie">0%</span></h4>
+<h4>ROI: <span id="roi">0%</span></h4>
         <canvas id="grafico-cassa" width="400" height="300"></canvas>
 
 <!-- Contenitore per i bottoni -->
@@ -279,6 +282,9 @@ Grazie a un algoritmo avanzato, il sistema adatta le puntate automaticamente in 
             document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
             document.getElementById("input-container").style.display = "none";
             document.getElementById("gioco").style.display = "block";
+totaliGiocate = 0;
+vittorie = 0;
+aggiornaStatistiche();
             aggiornaGrafico();
         }
 
@@ -331,7 +337,9 @@ function giocataVinta() {
     cassaAttuale += giocataCorrente * (quota - 1);
     win_streak++; // Incrementa la serie di vittorie
     loss_streak = 0; // Resetta la serie di sconfitte
-
+totaliGiocate++;
+vittorie++;
+aggiornaStatistiche();
     aggiornaPuntata();
     aggiornaDopoGiocata();
 }
@@ -340,7 +348,8 @@ function giocataPersa() {
     cassaAttuale -= giocataCorrente;
     win_streak = 0; // Resetta la serie di vittorie
     loss_streak++; // Incrementa la serie di sconfitte
-
+totaliGiocate++;
+aggiornaStatistiche();
     aggiornaPuntata();
     aggiornaDopoGiocata();
 }
