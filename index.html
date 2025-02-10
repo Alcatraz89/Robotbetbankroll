@@ -166,30 +166,30 @@ function aggiornaDopoGiocata() {
 }
 
 
-        function aggiornaGrafico() {
-            const ctx = document.getElementById("grafico-cassa").getContext("2d");
-            if (window.grafico) window.grafico.destroy();
-            window.grafico = new Chart(ctx, {
-                type: "line",
-                data: {
-                    labels: etichetteGrafico,
-                    datasets: [{
-                        label: "Cassa Attuale",
-                        data: datiGrafico,
-                        borderColor: "blue",
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: { title: { display: true, text: "Giocate" } },
-                        y: { title: { display: true, text: "Cassa (€)" } }
-                    }
-                }
-            });
+function aggiornaGrafico() {
+    const ctx = document.getElementById("grafico-cassa").getContext("2d");
+    if (window.grafico) window.grafico.destroy();
+    window.grafico = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: etichetteGrafico,
+            datasets: [{
+                label: "Cassa Attuale",
+                data: datiGrafico,
+                borderColor: "grey",  // Cambia colore della linea
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: "Giocate" } },
+                y: { title: { display: true, text: "Cassa (€)" } }
+            }
         }
+    });
+}
         function salvaSessione() {
             const progressione = {
                 cassaAttuale,
