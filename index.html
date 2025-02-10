@@ -176,9 +176,10 @@ function aggiornaGrafico() {
             datasets: [{
                 label: "Cassa Attuale",
                 data: datiGrafico,
-                borderColor: "grey",  // Cambia colore della linea
-                borderWidth: 2,
-                fill: false
+                borderColor: "Grey",
+borderWidth: 2,
+fill: false,
+tension: 0.4  // Aggiunto per curvare la linea
             }]
         },
         options: {
