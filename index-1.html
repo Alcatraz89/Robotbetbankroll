@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoBOT Gestione Cassa</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Modalità base (giorno) */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .notte {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+/* Stile moderno per i bottoni */
+button {
+    cursor: pointer;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Bottone verde (Inizia, Vinta) */
+.btn-verde {
+    background: linear-gradient(45deg, #4CAF50, #2E7D32);
+    color: white;
+}
+
+.btn-verde:hover {
+    background: linear-gradient(45deg, #2E7D32, #1B5E20);
+    transform: scale(1.05);
+}
+
+/* Bottone rosso (Reset, Persa) */
+.btn-rosso {
+    background: linear-gradient(45deg, #dc3545, #a71d2a);
+    color: white;
+}
+
+.btn-rosso:hover {
+    background: linear-gradient(45deg, #a71d2a, #7b1e24);
+    transform: scale(1.05);
+}
+
+/* Bottone giallo (Salva Progressione) */
+.btn-giallo {
+    background: linear-gradient(45deg, #ffc107, #ff9800);
+    color: black;
+}
+
+.btn-giallo:hover {
+    background: linear-gradient(45deg, #ff9800, #ff6f00);
+    transform: scale(1.05);
+}
+
+/* Bottone blu (Carica Sessione) */
+.btn-blu {
+    background: linear-gradient(45deg, #007BFF, #0056b3);
+    color: white;
+}
+
+.btn-blu:hover {
+    background: linear-gradient(45deg, #0056b3, #003f7f);
+    transform: scale(1.05);
+}
+/* Contenitore per i bottoni sotto il grafico */
+.btn-container {
+    display: flex;
+    justify-content: center; /* Centra i bottoni */
+    gap: 15px; /* Spazio tra i bottoni */
+    margin-top: 20px; /* Spazio sopra */
+}
+.descrizione-sistema {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007BFF; /* Blu per evidenziare */
+    margin-top: 15px;
+    text-align: center;
+}
+
+.spiegazioni {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: left;
+    max-width: 500px;
+    margin: 20px auto;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.spiegazioni h3 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.spiegazioni p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+/* Stile base dei campi input */
+input {
+    background-color: #ffffff; /* Bianco di giorno */
+    color: #000000; /* Testo nero */
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Stile dei campi input in modalità notte */
+body.notte input {
+    background-color: #2e2e2e; /* Grigio scuro */
+    color: #ffffff; /* Testo bianco */
+    border: 1px solid #555; /* Bordo più scuro */
+}
+
+/* Cambia il colore del placeholder in modalità notte */
+body.notte input::placeholder {
+    color: #bbbbbb;
+}
+/* Stile del pulsante modalità giorno/notte */
+#modalita-btn {
+    background-color: #f1c40f; /* Giallo chiaro per il giorno */
+    color: black;
+    font-size: 20px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Posizionamento del pulsante in alto a destra */
+#modalita-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: #f1c40f; /* Giallo chiaro per il giorno */
+    color: black;
+    font-size: 28px; /* Grandezza dell'icona */
+    border-radius: 50%; /* Mantiene il bottone circolare */
+    width: 40px;  /* Ridotto a dimensione compatta */
+    height: 40px; /* Ridotto a dimensione compatta */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    
+    /* Centrare perfettamente l'icona */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1; /* Evita spostamenti verticali del simbolo */
+}
+
+/* Cambia colore SOLO lo sfondo del pulsante in modalità notte */
+body.notte #modalita-btn {
+    background-color: #2e2e2e; /* Grigio scuro di notte */
+    color: white;
+}
+
+/* Effetto hover per un tocco moderno */
+#modalita-btn:hover {
+    transform: scale(1.1);
+}
+    </style>
+</head>
+<body>
+    <h2>RoBOT Gestione Cassa</h2>
+    
+    <!-- Modalità Giorno/Notte -->
+    <button id="modalita-btn" onclick="toggleModalita()">🌞</button>
+    <!-- Input Cassa Iniziale -->
+    <div id="input-container">
+        <h3>Inserisci Cassa Iniziale:</h3>
+        <input type="number" id="cassa-iniziale" placeholder="€" step="0.01" min="0">
+		<br>
+<button class="btn-verde" onclick="iniziaGioco()">Inizia</button>
+<br>
+<button class="btn-blu" onclick="caricaSessione()">Carica Sessione</button>
+<!-- Descrizione del sistema -->
+<div class="descrizione-sistema">
+    <p><strong>🔹 Sistema basato sul canale Telegram RoBOT BET</strong></p>
+</div>
+
+<!-- Spiegazione delle funzioni -->
+<div class="spiegazioni">
+    <h3>📌 Cassa Iniziale:</h3>
+    <p>Inserisci l'importo iniziale con cui vuoi giocare. La progressione si basa su questa cifra, regolando le puntate automaticamente.</p>
+
+    <h3>🏆 Vinta & ❌ Persa:</h3>
+    <p>Quando clicchi su "Vinta", il saldo aumenta in base alla quota giocata. Se clicchi "Persa", il sistema adatta automaticamente l'importo della prossima puntata per recuperare eventuali perdite.</p>
+    <p>🔄 Dopo 2 sconfitte consecutive, la puntata aumenta per recuperare la cassa.</p>
+    <p>✅ Dopo 3 vittorie consecutive, la puntata si riduce per proteggere il bankroll.</p>
+
+    <h3>📊 Quota:</h3>
+    <p>Inserisci la quota del tuo evento. Il sistema calcolerà i guadagni in base alla quota inserita.</p>
+
+    <h3>💾 Salva & Carica Progressione:</h3>
+    <p>🔹 <strong>Salva</strong>: Memorizza il tuo stato attuale, così puoi chiudere e riprendere più tardi.</p>
+    <p>🔹 <strong>Carica</strong>: Ripristina la sessione precedente per continuare la progressione da dove l'avevi lasciata.</p>
+    <h5>(Per cambiare modalità Giorno/Notte cliccare in alto a destra 🌞) </h5>
+</div>
+    </div>
+
+    <!-- Sezione Puntate -->
+    <div id="gioco" style="display:none;">
+        <h2>Puntata: <span id="puntata">€0.00</span></h2>
+        <label for="quota-giocata">Quota:</label>
+        <input type="number" id="quota-giocata" placeholder="Quota" step="0.01" min="1.01">
+        <br>
+        <button class="btn-verde" onclick="giocataVinta()">Vinta</button>
+<button class="btn-rosso" onclick="giocataPersa()">Persa</button>
+        <h3>Cassa Attuale: <span id="cassa-attuale">€0.00</span></h3>
+        <canvas id="grafico-cassa" width="400" height="300"></canvas>
+
+<!-- Contenitore per i bottoni -->
+<div class="btn-container">
+    <button class="btn-rosso reset" onclick="reset()">RESET</button>
+    <button class="btn-blu" onclick="salvaSessione()">Salva</button>
+</div>
+
+    <script>
+        let cassaIniziale = 0;
+        let cassaAttuale = 0;
+        let giocataCorrente = 0;
+        let datiGrafico = [];
+        let etichetteGrafico = [];
+
+        function toggleModalita() {
+            document.body.classList.toggle("notte");
+        }
+
+        function iniziaGioco() {
+            cassaIniziale = parseFloat(document.getElementById("cassa-iniziale").value);
+            if (isNaN(cassaIniziale) || cassaIniziale <= 0) {
+                alert("Inserisci una cassa valida.");
+                return;
+            }
+            cassaAttuale = cassaIniziale;
+            aggiornaPuntata();
+            datiGrafico = [cassaAttuale];
+            etichetteGrafico = [0];
+            document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+            document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+            document.getElementById("input-container").style.display = "none";
+            document.getElementById("gioco").style.display = "block";
+            aggiornaGrafico();
+        }
+
+let win_streak = 0;
+let loss_streak = 0;
+
+function aggiornaPuntata() {
+    let percentualePuntata = 0.10; // Puntata base al 10%
+
+    // Se hai perso 2 volte di fila, la puntata aumenta al 15%
+    if (loss_streak >= 2) {
+        percentualePuntata = 0.15;
+    }
+
+    // Se hai vinto 3 volte di fila, la puntata si riduce al 5%
+    if (win_streak >= 3) {
+        percentualePuntata = 0.05;
+    }
+
+    // Se hai vinto dopo una sconfitta, riportiamo la puntata al 10%
+    if (win_streak === 1 && loss_streak > 0) {
+        percentualePuntata = 0.10;
+    }
+
+    // Calcola la puntata come percentuale della cassa
+    giocataCorrente = cassaAttuale * percentualePuntata;
+
+    // Arrotonda la puntata ai 50 centesimi più vicini
+    giocataCorrente = Math.round(giocataCorrente * 2) / 2;
+
+    // Assicura che la puntata non vada sotto 0.50€ se la cassa lo permette
+    if (giocataCorrente < 0.50 && cassaAttuale >= 0.50) {
+        giocataCorrente = 0.50;
+    }
+
+    document.getElementById('puntata').textContent = `€${giocataCorrente.toFixed(2)}`;
+}
+
+function giocataVinta() {
+    const quota = parseFloat(document.getElementById("quota-giocata").value);
+    if (isNaN(quota) || quota <= 1) {
+        alert("Inserisci una quota valida.");
+        return;
+    }
+
+    // Aggiunge la vincita alla cassa
+    cassaAttuale += giocataCorrente * (quota - 1);
+    win_streak++; // Incrementa la serie di vittorie
+    loss_streak = 0; // Resetta la serie di sconfitte
+
+    aggiornaPuntata();
+    aggiornaDopoGiocata();
+}
+
+function giocataPersa() {
+    cassaAttuale -= giocataCorrente;
+    win_streak = 0; // Resetta la serie di vittorie
+    loss_streak++; // Incrementa la serie di sconfitte
+
+    aggiornaPuntata();
+    aggiornaDopoGiocata();
+}
+
+function aggiornaDopoGiocata() {
+    cassaAttuale = Math.max(0, cassaAttuale); // Evita valori negativi
+    aggiornaPuntata();
+    datiGrafico.push(cassaAttuale);
+    etichetteGrafico.push(datiGrafico.length);
+    document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+    document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+    aggiornaGrafico();
+}
+
+
+        function aggiornaGrafico() {
+            const ctx = document.getElementById("grafico-cassa").getContext("2d");
+            if (window.grafico) window.grafico.destroy();
+            window.grafico = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: etichetteGrafico,
+                    datasets: [{
+                        label: "Cassa Attuale",
+                        data: datiGrafico,
+                        borderColor: "grey",
+                        borderWidth: 2,
+                 fill: true,
+                tension: 0.4  // <--- Aggiunta curvatura alla linea
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: "Giocate" } },
+                        y: { title: { display: true, text: "Cassa (€)" } }
+                    }
+                }
+            });
+        }
+        function salvaSessione() {
+            const progressione = {
+                cassaAttuale,
+                giocataCorrente,
+                datiGrafico,
+                etichetteGrafico
+            };
+            localStorage.setItem("progressioneMasaniello", JSON.stringify(progressione));
+            alert("Progressione salvata!");
+        }
+function reset() {
+    // Resetta le variabili della sessione
+    cassaIniziale = 0;
+    cassaAttuale = 0;
+    giocataCorrente = 0;
+    datiGrafico = [];
+    etichetteGrafico = [];
+    
+    // Resetta il localStorage per eliminare i dati salvati
+    localStorage.removeItem("progressioneMasaniello");
+
+    // Resetta l'input della cassa iniziale
+    document.getElementById("cassa-iniziale").value = "";
+
+    // Ripristina la visibilità dei container
+    document.getElementById("input-container").style.display = "block";
+    document.getElementById("gioco").style.display = "none";
+
+    // Pulisce il grafico e l'area dei risultati
+    document.getElementById("cassa-attuale").textContent = "€0.00";
+    document.getElementById("puntata").textContent = "€0.00";
+    document.getElementById("quota-giocata").value = "";
+
+    // Resetta il grafico se esiste
+    if (window.grafico) {
+        window.grafico.destroy();
+    }
+
+    alert("Sessione resettata!");
+}
+
+
+        function caricaSessione() {
+            const progressione = JSON.parse(localStorage.getItem("progressioneMasaniello"));
+            if (!progressione) {
+                alert("Nessuna sessione salvata trovata.");
+                return;
+            }
+            cassaAttuale = progressione.cassaAttuale;
+            giocataCorrente = progressione.giocataCorrente;
+            datiGrafico = progressione.datiGrafico;
+            etichetteGrafico = progressione.etichetteGrafico;
+            document.getElementById("input-container").style.display = "none";
+            document.getElementById("gioco").style.display = "block";
+            document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+            document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+            aggiornaGrafico();
+            alert("Sessione caricata!");
+        }
+    </script>
+</body>
+</html>
