@@ -108,7 +108,7 @@ function aggiornaPuntata() {
     } else if (win_streak >= 3) {
         giocataCorrente *= 0.9; // Stake ridotto dopo 3 vittorie di fila
     } else {
-        giocataCorrente = Math.round((cassaAttuale * 0.05) * 2) / 2; // Stake al 5% con arrotondamento
+        giocataCorrente = Math.round((cassaAttuale * 0.10) * 2) / 2; // Stake al 5% con arrotondamento
     }
     document.getElementById('puntata').textContent = `€${giocataCorrente.toFixed(2)}`;
 }
@@ -126,7 +126,7 @@ function giocataVinta() {
 
     // Se vinci 3 volte di fila, riduci lo stake del 10% per proteggere il bankroll
     if (win_streak >= 3) {
-        giocataCorrente *= 0.9; // Diminuisce del 10%
+        giocataCorrente *= 1.1; // Diminuisce del 10%
     } else {
         giocataCorrente = Math.round((cassaAttuale * 0.10) * 2) / 2; // Torna al 5%
     }
