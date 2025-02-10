@@ -286,21 +286,24 @@ let win_streak = 0;
 let loss_streak = 0;
 
 function aggiornaPuntata() {
-    let percentualePuntata = 0.10; // Puntata base al 10%
+    let percentualePuntata = 0.05; // Puntata base al 5%
 
-    // Se hai perso 2 volte di fila, la puntata aumenta al 15%
-    if (loss_streak >= 2) {
-        percentualePuntata = 0.15;
+    // Logica per sconfitte consecutive
+    if (loss_streak === 1) {
+        percentualePuntata = 0.06; // Dopo 1 sconfitta sale al 6%
+    } else if (loss_streak === 2) {
+        percentualePuntata = 0.08; // Dopo 2 sconfitte sale all'8%
+    } else if (loss_streak >= 3) {
+        percentualePuntata = 0.08; // Dopo 3 sconfitte rimane all'8%
     }
 
-    // Se hai vinto 3 volte di fila, la puntata si riduce al 5%
-    if (win_streak >= 3) {
-        percentualePuntata = 0.05;
-    }
-
-    // Se hai vinto dopo una sconfitta, riportiamo la puntata al 10%
-    if (win_streak === 1 && loss_streak > 0) {
-        percentualePuntata = 0.10;
+    // Logica per vittorie consecutive
+    if (win_streak === 1) {
+        percentualePuntata = 0.08; // Dopo 1 vittoria sale all'8%
+    } else if (win_streak === 2) {
+        percentualePuntata = 0.06; // Dopo 2 vittorie scende al 6%
+    } else if (win_streak >= 3) {
+        percentualePuntata = 0.05; // Dopo 3 vittorie torna al 5%
     }
 
     // Calcola la puntata come percentuale della cassa
@@ -309,7 +312,7 @@ function aggiornaPuntata() {
     // Arrotonda la puntata ai 50 centesimi più vicini
     giocataCorrente = Math.round(giocataCorrente * 2) / 2;
 
-    // Assicura che la puntata non vada sotto 0.50€ se la cassa lo permette
+    // Assicura che la puntata minima sia 0.50€ se la cassa lo permette
     if (giocataCorrente < 0.50 && cassaAttuale >= 0.50) {
         giocataCorrente = 0.50;
     }
