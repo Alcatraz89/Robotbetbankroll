@@ -128,7 +128,7 @@ function giocataVinta() {
     if (win_streak >= 3) {
         giocataCorrente *= 1.1; // Diminuisce del 10%
     } else {
-        giocataCorrente = Math.round((cassaAttuale * 0.10) * 2) / 2; // Torna al 5%
+        giocataCorrente = Math.ceil((cassaAttuale * 0.10) * 2) / 2; // Torna al 5%
     }
 
     aggiornaDopoGiocata();
