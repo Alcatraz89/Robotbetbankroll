@@ -147,7 +147,7 @@ function giocataPersa() {
     if (loss_streak >= 2) {
         giocataCorrente = Math.min(cassaAttuale * 0.15, giocataCorrente * 1.5); // Massimo 15% del bankroll
     } else {
-        giocataCorrente = Math.round((cassaAttuale * 0.10) * 2) / 2; // Torna al 5%
+        giocataCorrente = Math.ceil((cassaAttuale * 0.10) * 2) / 2; // Torna al 5%
     }
 
     aggiornaDopoGiocata();
