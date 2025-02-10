@@ -106,9 +106,9 @@ function aggiornaPuntata() {
     if (loss_streak >= 2) {
         giocataCorrente = Math.min(cassaAttuale * 0.15, giocataCorrente * 1.5); // Stake aumenta dopo 2 perse
     } else if (win_streak >= 3) {
-        giocataCorrente *= 0.9; // Stake ridotto dopo 3 vittorie di fila
+        giocataCorrente *= 1.1; // Stake ridotto dopo 3 vittorie di fila
     } else {
-        giocataCorrente = Math.round((cassaAttuale * 0.10) * 2) / 2; // Stake al 5% con arrotondamento
+        giocataCorrente = Math.ceil((cassaAttuale * 0.10) * 2) / 2; // Stake al 5% con arrotondamento
     }
     document.getElementById('puntata').textContent = `€${giocataCorrente.toFixed(2)}`;
 }
@@ -147,7 +147,7 @@ function giocataPersa() {
     if (loss_streak >= 2) {
         giocataCorrente = Math.min(cassaAttuale * 0.15, giocataCorrente * 1.5); // Massimo 15% del bankroll
     } else {
-        giocataCorrente = Math.round((cassaAttuale * 0.05) * 2) / 2; // Torna al 5%
+        giocataCorrente = Math.round((cassaAttuale * 0.10) * 2) / 2; // Torna al 5%
     }
 
     aggiornaDopoGiocata();
