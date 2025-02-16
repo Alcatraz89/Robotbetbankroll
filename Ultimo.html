@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoBOT Gestione Cassa - Grafici 300x200</title>
+  <!-- Importa Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Importa il plugin per le datalabels -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <style>
+    /* Stili base */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #000;
+      text-align: center;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .notte {
+      background-color: #2e2e2e;
+      color: #f0f0f0;
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    /* Bottoni moderni */
+    button {
+      cursor: pointer;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      border: none;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .btn-verde {
+      background: linear-gradient(45deg, #4CAF50, #2E7D32);
+      color: white;
+    }
+    .btn-verde:hover {
+      background: linear-gradient(45deg, #2E7D32, #1B5E20);
+      transform: scale(1.05);
+    }
+    .btn-rosso {
+      background: linear-gradient(45deg, #dc3545, #a71d2a);
+      color: white;
+    }
+    .btn-rosso:hover {
+      background: linear-gradient(45deg, #a71d2a, #7b1e24);
+      transform: scale(1.05);
+    }
+    .btn-blu {
+      background: linear-gradient(45deg, #007BFF, #0056b3);
+      color: white;
+    }
+    .btn-blu:hover {
+      background: linear-gradient(45deg, #0056b3, #003f7f);
+      transform: scale(1.05);
+    }
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+.puntata-box {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #2e2e2e;
+    border-radius: 10px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    font-size: 1.2rem;
+}
+body.notte .spiegazioni {
+  background-color: #333; /* Sfondo scuro */
+  color: #f0f0f0; /* Testo chiaro */
+  border: 1px solid #555; /* Bordo più visibile */
+}
+
+body.notte .spiegazioni h3 {
+  color: #f0f0f0; /* Titoli chiari per contrasto */
+}
+
+body.notte .spiegazioni p, 
+body.notte .spiegazioni li {
+  color: #dddddd; /* Testo più chiaro per miglior leggibilità */
+}
+body.notte .puntata-box {
+    background-color: #272625;
+    border: 1px solid #ccc;
+    color: lightgray;
+}
+    .descrizione-sistema {
+      font-size: 18px;
+      font-weight: bold;
+      color: #007BFF;
+      margin-top: 15px;
+      text-align: center;
+    }
+    .spiegazioni {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: left;
+      max-width: 500px;
+      margin: 20px auto;
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .spiegazioni h3 { color: #333; margin-bottom: 5px; }
+    .spiegazioni p {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    input {
+      background-color: #fff;
+      color: #000;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+    body.notte input {
+      background-color: #2e2e2e;
+      color: #fff;
+      border: 1px solid #555;
+    }
+    body.notte input::placeholder { color: #bbbbbb; }
+    /* Pulsante modalità giorno/notte */
+    #modalita-btn {
+      background-color: #f1c40f;
+      color: black;
+      font-size: 20px;
+      border-radius: 50%;
+      width: 30px;
+      height: 40px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    body.notte #modalita-btn { background-color: #2e2e2e; color: white; }
+    #modalita-btn:hover { transform: scale(1.1); }
+    /* Canvas fissi: 300 x 200 */
+    canvas {
+      width: 300px !important;
+      height: 200px !important;
+      margin: 0 auto;
+      display: block;
+    }
+.logo {
+  width: 300px;  /* Larghezza del logo */
+  height: 120px; /* Altezza del logo */
+  display: block;
+  margin: 0 auto 20px auto; /* Centra il logo e aggiunge spazio sotto */
+}
+  </style>
+</head>
+<body>
+<img src="https://i.ibb.co/5gW1hP15/logo.jpg" alt="Logo" class="logo">
+  <!-- Modalità Giorno/Notte -->
+  <button id="modalita-btn" onclick="toggleModalita()">🌞</button>
+  <!-- Sezione Input Cassa Iniziale -->
+  <div id="input-container">
+    <h3>Inserisci Cassa Iniziale:</h3>
+    <input type="number" id="cassa-iniziale" placeholder="€" step="0.01" min="0">
+    <br>
+    <button class="btn-verde" onclick="iniziaGioco()">Inizia</button>
+    <br>
+    <button class="btn-blu" onclick="caricaSessione()">Carica Sessione</button>
+    <div class="descrizione-sistema">
+      <p><strong>🔹 Sistema Avanzato di Calcolo per i Segnali RoBOT</strong></p>
+    </div>
+    <div class="spiegazioni">
+      <h3>🤖 Sistema</h3>
+      <p>Il sistema gestisce la cassa in base ai segnali e regola le puntate automaticamente, ottimizzando i guadagni e limitando i rischi.</p>
+      <h3>📌 Cassa Iniziale:</h3>
+      <p>Inserisci l'importo iniziale con cui vuoi giocare.</p>
+      <h3>🏆 Vinta & ❌ Persa:</h3>
+      <p>Se vinci, la cassa aumenta; se perdi, il sistema adatta la puntata per recuperare le perdite. Dopo 2 sconfitte la puntata aumenta, dopo 3 vittorie si riduce.</p>
+      <h3>📊 Quota:</h3>
+      <p>Inserisci la quota del tuo evento: il sistema calcola i guadagni in base a questa.</p>
+      <h3>💾 Salva & Carica Progressione:</h3>
+      <p>Salva o carica la sessione per riprendere in seguito.</p>
+      <h3>📊 Vantaggi del Sistema</h3>
+      <p>100% automatico, ottimizzazione dinamica, protezione della cassa e recupero controllato.</p>
+      <h5>(Clicca sul pulsante in alto a destra 🌞 per cambiare modalità)</h5>
+    </div>
+  </div>
+  <!-- Sezione di Gioco (nascosta inizialmente) -->
+  <div id="gioco" style="display:none;">
+    <div class="puntata-box">
+    <b>Puntata:<b> <span id="puntata">€0.00</span>
+</div><br>
+    <label for="quota-giocata"></label>
+    <input type="number" id="quota-giocata" placeholder="Quota" step="0.01" min="1.01">
+    <br>
+    <button class="btn-verde" onclick="giocataVinta()">Vinta</button>
+    <button class="btn-rosso" onclick="giocataPersa()">Persa</button>
+    <h3>Cassa Attuale: <span id="cassa-attuale">€0.00</span></h3>
+    <!-- Grafico della Cassa -->
+    <canvas id="grafico-cassa" width="300" height="200"></canvas>
+    <h3>Statistiche Vittorie/Perdite</h3>
+    <!-- Grafico Vittorie/Perdite -->
+    <canvas id="grafico-vittorie-perdite" width="300" height="200"></canvas>
+    <h3>Evoluzione delle Quote Giocate</h3>
+    <!-- Grafico Quote Giocate -->
+    <canvas id="grafico-quote-giocate" width="300" height="200"></canvas>
+    <div class="btn-container">
+      <button class="btn-rosso" onclick="reset()">RESET</button>
+      <button class="btn-blu" onclick="salvaSessione()">Salva</button>
+    </div>
+  </div>
+  <script>
+    // REGISTRA IL PLUGIN per le datalabels
+    Chart.register(ChartDataLabels);
+
+    /* --------------------------
+       VARIABILI GLOBALI
+    -------------------------- */
+    let cassaIniziale = 0;
+    let cassaAttuale = 0;
+    let giocataCorrente = 0;
+    let datiGrafico = [];
+    let etichetteGrafico = [];
+    let quoteGiocate = [];
+
+    let vinte = 0;
+    let perse = 0;
+    let win_streak = 0;
+    let loss_streak = 0;
+
+    /* --------------------------
+       TOGGLE MODALITÀ GIORNO/NOTTE
+    -------------------------- */
+    function toggleModalita() {
+      document.body.classList.toggle("notte");
+    }
+// Verifica se la modalità notte è già attiva e la imposta al caricamento della pagina
+document.addEventListener("DOMContentLoaded", function() {
+    if (localStorage.getItem("modalitaNotte") === "attiva") {
+        document.body.classList.add("notte");
+    }
+});
+
+// Funzione per attivare/disattivare la modalità notte e salvarla
+function toggleModalita() {
+    document.body.classList.toggle("notte");
+    if (document.body.classList.contains("notte")) {
+        localStorage.setItem("modalitaNotte", "attiva");
+    } else {
+        localStorage.removeItem("modalitaNotte");
+    }
+}
+
+    /* --------------------------
+       INIZIA GIOCO
+    -------------------------- */
+    function iniziaGioco() {
+      cassaIniziale = parseFloat(document.getElementById("cassa-iniziale").value);
+      if (isNaN(cassaIniziale) || cassaIniziale <= 0) {
+        alert("Inserisci una cassa valida.");
+        return;
+      }
+      cassaAttuale = cassaIniziale;
+      aggiornaPuntata();
+      datiGrafico = [cassaAttuale];
+      etichetteGrafico = [0];
+      document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+      document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+      document.getElementById("input-container").style.display = "none";
+      document.getElementById("gioco").style.display = "block";
+      aggiornaGrafico();
+      aggiornaGraficoVintePerse();
+      aggiornaGraficoQuoteGiocate();
+    }
+
+    /* --------------------------
+       AGGIORNA PUNTATA
+    -------------------------- */
+    function aggiornaPuntata() {
+      let percentualePuntata = 0.05;
+      if (loss_streak === 1) {
+        percentualePuntata = 0.06;
+      } else if (loss_streak === 2) {
+        percentualePuntata = 0.08;
+      } else if (loss_streak >= 3) {
+        percentualePuntata = 0.08;
+      }
+      if (win_streak === 1) {
+        percentualePuntata = 0.08;
+      } else if (win_streak === 2) {
+        percentualePuntata = 0.08;
+      } else if (win_streak >= 3) {
+        percentualePuntata = 0.05;
+      }
+      giocataCorrente = cassaAttuale * percentualePuntata;
+      giocataCorrente = Math.round(giocataCorrente * 2) / 2;
+      if (giocataCorrente < 0.50 && cassaAttuale >= 0.50) {
+        giocataCorrente = 0.50;
+      }
+      document.getElementById('puntata').textContent = `€${giocataCorrente.toFixed(2)}`;
+    }
+
+    /* --------------------------
+       GIOCATE: VINTA E PERSA
+    -------------------------- */
+    function giocataVinta() {
+      const quota = parseFloat(document.getElementById("quota-giocata").value);
+      if (isNaN(quota) || quota <= 1) {
+        alert("Inserisci una quota valida (maggiore di 1).");
+        return;
+      }
+      cassaAttuale += giocataCorrente * (quota - 1);
+      win_streak++;
+      loss_streak = 0;
+      vinte++;
+      quoteGiocate.push(quota);
+      aggiornaPuntata();
+      aggiornaDopoGiocata();
+      aggiornaGrafico();
+      aggiornaGraficoVintePerse();
+      aggiornaGraficoQuoteGiocate();
+    }
+
+    function giocataPersa() {
+      cassaAttuale -= giocataCorrente;
+      win_streak = 0;
+      loss_streak++;
+      perse++;
+      const quota = parseFloat(document.getElementById("quota-giocata").value);
+      if (!isNaN(quota) && quota > 1) {
+        quoteGiocate.push(quota);
+      }
+      aggiornaPuntata();
+      aggiornaDopoGiocata();
+      aggiornaGrafico();
+      aggiornaGraficoVintePerse();
+      aggiornaGraficoQuoteGiocate();
+    }
+
+    /* --------------------------
+       AGGIORNA DOPO OGNI GIOCATA
+    -------------------------- */
+    function aggiornaDopoGiocata() {
+      cassaAttuale = Math.max(0, cassaAttuale);
+      datiGrafico.push(cassaAttuale);
+      etichetteGrafico.push(datiGrafico.length);
+      document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+      document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+    }
+
+    /* --------------------------
+       GRAFICO DELLA CASSA (Line Chart)
+       Dimensioni fisse: 300x200
+    -------------------------- */
+   function aggiornaGrafico() {
+  const ctx = document.getElementById("grafico-cassa").getContext("2d");
+  if (window.graficoCassa) { window.graficoCassa.destroy(); }
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, "rgba(0, 123, 255, 0.5)");
+  gradient.addColorStop(1, "rgba(0, 123, 255, 0.1)");
+
+  // Mostra solo 1 punto ogni 5 giocate
+  const passo = 3; // Cambia questo valore per ridurre più o meno i punti
+  const etichetteFiltrate = etichetteGrafico.filter((_, index) => index % passo === 0);
+  const datiFiltrati = datiGrafico.filter((_, index) => index % passo === 0);
+
+  window.graficoCassa = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: etichetteFiltrate,
+      datasets: [{
+        label: "Cassa Attuale",
+        data: datiFiltrati,
+        borderColor: "#007BFF",
+        backgroundColor: gradient,
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 2 // Modifica se vuoi ridurre la grandezza dei punti
+      }]
+    },
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      scales: {
+        x: { title: { display: true, text: "Giocate" } },
+        y: { title: { display: true, text: "Cassa (€)" }, beginAtZero: true }
+      },
+      plugins: {
+        datalabels: { display: false } // Nasconde le scritte sopra i punti
+      }
+    }
+  });
+}
+
+    /* --------------------------
+       GRAFICO VITTORIE/PERDITE (Bar Chart)
+       Dimensioni fisse: 300x200
+    -------------------------- */
+    function aggiornaGraficoVintePerse() {
+      const totalePartite = vinte + perse;
+      const percentualeVinte = (totalePartite > 0) ? (vinte / totalePartite * 100).toFixed(2) : 0;
+      const percentualePerse = (totalePartite > 0) ? (perse / totalePartite * 100).toFixed(2) : 0;
+      const ctx = document.getElementById("grafico-vittorie-perdite").getContext("2d");
+      if (window.graficoVintePerse) { window.graficoVintePerse.destroy(); }
+      window.graficoVintePerse = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Vinte", "Perse"],
+          datasets: [
+            {
+              label: "Numero",
+              data: [vinte, perse],
+              backgroundColor: ["#4CAF50", "#dc3545"]
+            },
+            {
+              label: "Percentuale",
+              data: [percentualeVinte, percentualePerse],
+              backgroundColor: ["rgba(76, 175, 80, 0.5)", "rgba(220, 53, 69, 0.5)"]
+            }
+          ]
+        },
+        options: {
+          responsive: false,
+          maintainAspectRatio: false,
+          scales: {
+            y: { title: { display: true, text: "Numero/Percentuale" }, beginAtZero: true }
+          },
+          plugins: {
+            datalabels: {
+              display: function(context) {
+                return context.dataset.label === "Percentuale";
+              },
+              color: "#000",
+              anchor: "center",
+              align: "center",
+              font: { weight: "bold" },
+              formatter: function(value) { return value + "%"; }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }
+
+    /* --------------------------
+       GRAFICO DELLE QUOTE GIocate (Line Chart)
+       Dimensioni fisse: 300x200
+    -------------------------- */
+    function aggiornaGraficoQuoteGiocate() {
+  const ctx = document.getElementById("grafico-quote-giocate").getContext("2d");
+  if (window.graficoQuoteGiocate) { window.graficoQuoteGiocate.destroy(); }
+
+  // Mostra solo 1 punto ogni 5 giocate (modifica il valore di passo per cambiare la densità)
+  const passo = 4;
+  const etichetteFiltrate = quoteGiocate.map((_, index) => index + 1).filter((_, index) => index % passo === 0);
+  const datiFiltrati = quoteGiocate.filter((_, index) => index % passo === 0);
+
+  window.graficoQuoteGiocate = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: etichetteFiltrate,
+      datasets: [{
+        label: "Quote Giocate",
+        data: datiFiltrati,
+        borderColor: "#F4A460",
+        backgroundColor: "rgba(255, 152, 0, 0.2)",
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 3 // Riduci i puntini per evitare sovrapposizioni
+      }]
+    },
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      scales: {
+        x: { title: { display: true, text: "Numero Giocate" } },
+        y: { title: { display: true, text: "Quota" }, beginAtZero: false }
+      },
+      plugins: {
+        legend: { display: true },
+        tooltip: { enabled: true },
+        datalabels: { display: false } // Nasconde i numeri sopra i punti
+      }
+    }
+  });
+}
+
+    /* --------------------------
+       SALVATAGGIO E RESET
+    -------------------------- */
+    function salvaSessione() {
+      const progressione = {
+        cassaAttuale,
+        giocataCorrente,
+        datiGrafico,
+        etichetteGrafico,
+        quoteGiocate,
+        vinte,
+        perse,
+        win_streak,
+        loss_streak
+      };
+      localStorage.setItem("progressioneMasaniello", JSON.stringify(progressione));
+      alert("Progressione salvata!");
+    }
+
+    function reset() {
+      cassaIniziale = 0;
+      cassaAttuale = 0;
+      giocataCorrente = 0;
+      datiGrafico = [];
+      etichetteGrafico = [];
+      quoteGiocate = [];
+      vinte = 0;
+      perse = 0;
+      win_streak = 0;
+      loss_streak = 0;
+      localStorage.removeItem("progressioneMasaniello");
+      document.getElementById("cassa-iniziale").value = "";
+      document.getElementById("input-container").style.display = "block";
+      document.getElementById("gioco").style.display = "none";
+      document.getElementById("cassa-attuale").textContent = "€0.00";
+      document.getElementById("puntata").textContent = "€0.00";
+      document.getElementById("quota-giocata").value = "";
+      if (window.graficoCassa) { window.graficoCassa.destroy(); }
+      if (window.graficoVintePerse) { window.graficoVintePerse.destroy(); }
+      if (window.graficoQuoteGiocate) { window.graficoQuoteGiocate.destroy(); }
+      alert("Sessione resettata!");
+    }
+
+    function caricaSessione() {
+      const progressione = JSON.parse(localStorage.getItem("progressioneMasaniello"));
+      if (!progressione) {
+        alert("Nessuna sessione salvata trovata.");
+        return;
+      }
+      cassaAttuale = progressione.cassaAttuale;
+      giocataCorrente = progressione.giocataCorrente;
+      datiGrafico = progressione.datiGrafico;
+      etichetteGrafico = progressione.etichetteGrafico;
+      quoteGiocate = progressione.quoteGiocate || [];
+      vinte = progressione.vinte || 0;
+      perse = progressione.perse || 0;
+      win_streak = progressione.win_streak || 0;
+      loss_streak = progressione.loss_streak || 0;
+      document.getElementById("input-container").style.display = "none";
+      document.getElementById("gioco").style.display = "block";
+      document.getElementById("cassa-attuale").textContent = `€${cassaAttuale.toFixed(2)}`;
+      document.getElementById("puntata").textContent = `€${giocataCorrente.toFixed(2)}`;
+      aggiornaGrafico();
+      aggiornaGraficoVintePerse();
+      aggiornaGraficoQuoteGiocate();
+      alert("Sessione caricata!");
+    }
+  </script>
+</body>
+</html>
