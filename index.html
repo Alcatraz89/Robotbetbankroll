@@ -301,16 +301,16 @@ function toggleModalita() {
       if (loss_streak === 1) {
         percentualePuntata = 0.06;
       } else if (loss_streak === 2) {
-        percentualePuntata = 0.08;
+        percentualePuntata = 0.07;
       } else if (loss_streak >= 3) {
-        percentualePuntata = 0.08;
+        percentualePuntata = 0.06;
       }
       if (win_streak === 1) {
-        percentualePuntata = 0.08;
+        percentualePuntata = 0.07;
       } else if (win_streak === 2) {
         percentualePuntata = 0.08;
       } else if (win_streak >= 3) {
-        percentualePuntata = 0.05;
+        percentualePuntata = 0.07;
       }
       giocataCorrente = cassaAttuale * percentualePuntata;
       giocataCorrente = Math.round(giocataCorrente * 2) / 2;
