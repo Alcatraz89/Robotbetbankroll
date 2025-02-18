@@ -256,7 +256,11 @@ body.notte .puntata-box {
     }
 // Verifica se la modalità notte è già attiva e la imposta al caricamento della pagina
 document.addEventListener("DOMContentLoaded", function() {
-    if (localStorage.getItem("modalitaNotte") === "attiva") {
+    if (localStorage.getItem("modalitaNotte") === null) {
+        // Se non è stato impostato nulla, attiva la modalità notte di default
+        localStorage.setItem("modalitaNotte", "attiva");
+        document.body.classList.add("notte");
+    } else if (localStorage.getItem("modalitaNotte") === "attiva") {
         document.body.classList.add("notte");
     }
 });
