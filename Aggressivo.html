@@ -301,20 +301,20 @@ function toggleModalita() {
        AGGIORNA PUNTATA
     -------------------------- */
     function aggiornaPuntata() {
-      let percentualePuntata = 0.05;
+      let percentualePuntata = 0.10;
       if (loss_streak === 1) {
-        percentualePuntata = 0.06;
+        percentualePuntata = 0.11;
       } else if (loss_streak === 2) {
-        percentualePuntata = 0.07;
+        percentualePuntata = 0.12;
       } else if (loss_streak >= 3) {
-        percentualePuntata = 0.06;
+        percentualePuntata = 0.13;
       }
       if (win_streak === 1) {
-        percentualePuntata = 0.07;
+        percentualePuntata = 0.12;
       } else if (win_streak === 2) {
-        percentualePuntata = 0.08;
+        percentualePuntata = 0.13;
       } else if (win_streak >= 3) {
-        percentualePuntata = 0.08;
+        percentualePuntata = 0.12;
       }
       giocataCorrente = cassaAttuale * percentualePuntata;
       giocataCorrente = Math.round(giocataCorrente * 2) / 2;
