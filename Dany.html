@@ -310,11 +310,11 @@ function toggleModalita() {
         percentualePuntata = 0.13;
       }
       if (win_streak === 1) {
-        percentualePuntata = 0.12;
-      } else if (win_streak === 2) {
         percentualePuntata = 0.13;
+      } else if (win_streak === 2) {
+        percentualePuntata = 0.14;
       } else if (win_streak >= 3) {
-        percentualePuntata = 0.12;
+        percentualePuntata = 0.13;
       }
       giocataCorrente = cassaAttuale * percentualePuntata;
       giocataCorrente = Math.round(giocataCorrente * 2) / 2;
