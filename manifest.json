@@ -1,0 +1,21 @@
+{
+  "name": "Robot Cassa",
+  "short_name": "RobotCassa",
+  "description": "Un'app per gestire la propria Cassa nelle scommesse Progressive",
+  "start_url": "https://alcatraz89.github.io/Robotbetbankroll/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff0000",
+  "icons": [
+    {
+      "src": "icona.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
