@@ -300,29 +300,46 @@ function toggleModalita() {
     /* --------------------------
        AGGIORNA PUNTATA
     -------------------------- */
-    function aggiornaPuntata() {
-      let percentualePuntata = 0.10;
-      if (loss_streak === 1) {
-        percentualePuntata = 0.12;
-      } else if (loss_streak === 2) {
-        percentualePuntata = 0.15;
-      } else if (loss_streak >= 3) {
-        percentualePuntata = 0.17;
-      }
-      if (win_streak === 1) {
-        percentualePuntata = 0.15;
-      } else if (win_streak === 2) {
-        percentualePuntata = 0.17;
-      } else if (win_streak >= 3) {
-        percentualePuntata = 0.19;
-      }
-      giocataCorrente = cassaAttuale * percentualePuntata;
-      giocataCorrente = Math.round(giocataCorrente * 2) / 2;
-      if (giocataCorrente < 0.50 && cassaAttuale >= 0.50) {
-        giocataCorrente = 0.50;
-      }
-      document.getElementById('puntata').textContent = `€${giocataCorrente.toFixed(2)}`;
+function aggiornaPuntata() {
+    let percentualePuntata = 0.10;
+    let cassaIniziale = 50; // Cambia se vuoi permettere all'utente di modificarlo
+
+    // Protezione della cassa
+    if (cassaAttuale >= cassaIniziale * 1.80) {  
+        percentualePuntata = 0.07;  // Se la cassa supera l'80% di guadagno, si abbassa il rischio
+    } else if (cassaAttuale <= cassaIniziale * 0.60) {  
+        percentualePuntata = 0.15;  // Se la cassa scende sotto il 60%, la puntata aumenta per recupero
     }
+
+    // Gestione dinamica delle puntate
+    if (loss_streak === 1) {
+        percentualePuntata = 0.13;
+    } else if (loss_streak === 2) {
+        percentualePuntata = 0.16;
+    } else if (loss_streak >= 3) {
+        percentualePuntata = 0.18;
+    }
+
+    if (win_streak === 1) {
+        percentualePuntata = 0.12;
+    } else if (win_streak === 2) {
+        percentualePuntata = 0.10;
+    } else if (win_streak >= 3) {
+        percentualePuntata = 0.08;  // Dopo 3 vittorie consecutive, si riduce per proteggere il guadagno
+    }
+
+    // Modalità sicurezza se la cassa è più del doppio
+    if (cassaAttuale >= cassaIniziale * 2) {
+        percentualePuntata = 0.07;
+    }
+
+    giocataCorrente = Math.round(cassaAttuale * percentualePuntata * 2) / 2;
+    if (giocataCorrente < 0.50 && cassaAttuale >= 0.50) {
+        giocataCorrente = 0.50;
+    }
+
+    document.getElementById('puntata').textContent = `€${giocataCorrente.toFixed(2)}`;
+}
 
     /* --------------------------
        GIOCATE: VINTA E PERSA
