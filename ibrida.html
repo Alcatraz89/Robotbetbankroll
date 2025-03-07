@@ -312,17 +312,17 @@ function aggiornaPuntata() {
 
     // Gestione dinamica delle puntate
     if (loss_streak === 1) {
-        percentualePuntata = 0.13;
+        percentualePuntata = 0.12;
     } else if (loss_streak === 2) {
-        percentualePuntata = 0.16;
+        percentualePuntata = 0.14;
     } else if (loss_streak >= 3) {
-        percentualePuntata = 0.18;
+        percentualePuntata = 0.16;
     }
 
     if (win_streak === 1) {
-        percentualePuntata = 0.12;
+        percentualePuntata = 0.13;
     } else if (win_streak === 2) {
-        percentualePuntata = 0.10;
+        percentualePuntata = 0.14;
     } else if (win_streak >= 3) {
         percentualePuntata = 0.08;  // Dopo 3 vittorie consecutive, si riduce per proteggere il guadagno
     }
